@@ -1810,6 +1810,7 @@ export default function App() {
       quantidade: 1,
       termoBusca: "",
       mostrarSugestoes: false,
+      produtoSelecionado: "",
     },
   ]);
 
@@ -1877,6 +1878,11 @@ export default function App() {
         const preco = parseFloat(bloco.preco) || 0;
         const entrada = parseFloat(bloco.entrada) || 0;
         const parcelas = bloco.parcelas;
+        const opcoesFiltradas = Object.entries(produtos).filter(([, prod]) =>
+          prod.descricao
+            .toLowerCase()
+            .includes((bloco.termoBusca || "").toLowerCase())
+        );
 
         const {
           valorParcela,
@@ -1930,6 +1936,29 @@ export default function App() {
             style={{ border: "1px solid #ccc", padding: 15, marginBottom: 20 }}
           >
             <div style={{ position: "relative", marginBottom: 10 }}>
+              <select
+                value={bloco.produtoSelecionado}
+                onChange={(e) => {
+                  const codigo = e.target.value;
+                  atualizarCampo(i, "produtoSelecionado", codigo);
+                  selecionarProduto(i, codigo);
+                }}
+                style={{
+                  marginBottom: "10px",
+                  padding: "6px",
+                  width: "100%",
+                  backgroundColor: "#fff9c4",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="">Selecione um produto</option>
+                {opcoesFiltradas.map(([cod, prod]) => (
+                  <option key={cod} value={cod}>
+                    {cod} - {prod.descricao}
+                  </option>
+                ))}
+              </select>
+
               <input
                 type="text"
                 placeholder="Buscar produto"
