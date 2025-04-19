@@ -1,4 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell, // ⬅️ este é o item que estava faltando!
+} from "recharts";
 
 // ✅ Função para formatar moeda
 const formatarMoeda = (valor) => {
@@ -1790,6 +1799,22 @@ const produtos = {
 
 // ✅ Agora sim a função App começa aqui
 export default function App() {
+  const [etapaTutorial, setEtapaTutorial] = useState(0);
+  const blocoInicialRef = useRef(null);
+
+  useEffect(() => {
+    if (etapaTutorial === 1 && blocoInicialRef.current) {
+      blocoInicialRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [etapaTutorial]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setEtapaTutorial((prev) => (prev < 4 ? prev + 1 : prev));
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [etapaTutorial]);
+
   const corClassificacao = (classe) => {
     switch (classe) {
       case "PERFEITO":
@@ -2025,7 +2050,15 @@ export default function App() {
               {formatarMoeda(bloco.custoBase)}
             </p>
 
-            <div style={{ display: "flex", gap: 10 }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 10,
+                rowGap: 15,
+                justifyContent: "flex-start",
+              }}
+            >
               <input
                 type="text"
                 placeholder="Valor Desejado"
@@ -2058,7 +2091,8 @@ export default function App() {
                   backgroundColor: "#fff9c4",
                   border: "1px solid #ccc",
                   padding: "4px",
-                  width: "120px",
+                  flex: "1 1 120px",
+                  minWidth: "120px",
                 }}
               />
 
@@ -2101,7 +2135,8 @@ export default function App() {
                   backgroundColor: "#fff9c4",
                   border: "1px solid #ccc",
                   padding: "4px",
-                  width: "120px",
+                  flex: "1 1 120px",
+                  minWidth: "120px",
                 }}
               />
 
@@ -2114,6 +2149,12 @@ export default function App() {
                     2
                   );
                   atualizarCampo(i, "entrada", entradaRecalculada);
+                }}
+                style={{
+                  backgroundColor: "#fff9c4",
+                  border: "1px solid #ccc",
+                  padding: "4px",
+                  width: "110px",
                 }}
               >
                 <option value={0}>% Entrada</option>
@@ -2130,6 +2171,12 @@ export default function App() {
               <select
                 value={bloco.parcelas}
                 onChange={(e) => atualizarCampo(i, "parcelas", +e.target.value)}
+                style={{
+                  backgroundColor: "#fff9c4",
+                  border: "1px solid #ccc",
+                  padding: "4px",
+                  width: "110px",
+                }}
               >
                 {Array.from({ length: 25 }, (_, n) => (
                   <option key={n} value={n}>
@@ -2201,6 +2248,55 @@ export default function App() {
                 <strong>Valor Real da Venda:</strong>{" "}
                 {formatarMoeda(totalLinha)}
               </p>
+              <div style={{ marginTop: 20 }}>
+                <h4>Distribuição do ROB</h4>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart
+                    data={[
+                      {
+                        faixa: "PERFEITO",
+                        valor: robReal >= 0.5 ? 1 : 0,
+                      },
+                      {
+                        faixa: "IDEAL",
+                        valor: robReal >= 0.45 && robReal < 0.5 ? 1 : 0,
+                      },
+                      {
+                        faixa: "ACEITÁVEL",
+                        valor: robReal >= 0.4 && robReal < 0.45 ? 1 : 0,
+                      },
+                      {
+                        faixa: "INADEQUADO",
+                        valor: robReal >= 0.35 && robReal < 0.4 ? 1 : 0,
+                      },
+                      {
+                        faixa: "REVENDEDOR",
+                        valor: robReal >= 0.25 && robReal < 0.35 ? 1 : 0,
+                      },
+                      {
+                        faixa: "PROIBIDO",
+                        valor: robReal < 0.25 ? 1 : 0,
+                      },
+                    ]}
+                  >
+                    <XAxis dataKey="faixa" />
+                    <YAxis hide />
+                    <Tooltip />
+                    <Bar dataKey="valor">
+                      {[
+                        "#00cc00", // PERFEITO
+                        "#00ff7f", // IDEAL
+                        "#b3ffcc", // ACEITÁVEL
+                        "#ffff99", // INADEQUADO
+                        "#ff9999", // REVENDEDOR
+                        "#990000", // PROIBIDO
+                      ].map((cor, index) => (
+                        <Cell key={index} fill={cor} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
             {blocos.length > 1 && (
