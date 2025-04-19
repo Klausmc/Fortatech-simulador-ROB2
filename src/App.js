@@ -2224,13 +2224,6 @@ export default function App() {
                 <strong>ROB Real:</strong> {(robReal * 100).toFixed(2)}%
               </p>
 
-              <p>
-                <strong>Status do ROB:</strong>{" "}
-                <span style={{ fontStyle: "italic", fontWeight: "bold" }}>
-                  {classificacao}
-                </span>
-              </p>
-
               {classificacao && (
                 <div
                   style={{
@@ -2307,7 +2300,7 @@ export default function App() {
                         "#00ff7f", // IDEAL
                         "#b3ffcc", // ACEITÁVEL
                         "#ffff99", // INADEQUADO
-                        "#ff9999", // REVENDEDOR
+                        "#33ccff", // REVENDEDOR
                         "#990000", // PROIBIDO
                       ].map((cor, index) => (
                         <Cell key={index} fill={cor} />
