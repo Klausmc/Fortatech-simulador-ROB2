@@ -2337,3 +2337,4 @@ export default function App() {
     </div>
   );
 }
+// Último ajuste para forçar build na Vercel
