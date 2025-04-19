@@ -1924,12 +1924,6 @@ export default function App() {
         const valorComissao = comissao * valorRealVenda;
         const totalLinha = valorRealVenda * bloco.quantidade;
 
-        const opcoesFiltradas = Object.entries(produtos).filter(([, prod]) =>
-          prod.descricao
-            .toLowerCase()
-            .includes((bloco.termoBusca || "").toLowerCase())
-        );
-
         return (
           <div
             key={i}
@@ -2017,21 +2011,11 @@ export default function App() {
               <input
                 type="text"
                 placeholder="Valor Desejado"
-                value={
-                  bloco.inputText !== undefined
-                    ? bloco.inputText
-                    : bloco.preco
-                    ? Number(bloco.preco).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })
-                    : ""
-                }
+                value={bloco.inputText ?? bloco.preco ?? ""}
                 onChange={(e) => {
                   const texto = e.target.value;
                   atualizarCampo(i, "inputText", texto);
 
-                  // Remove pontos e troca vírgula por ponto para parseFloat funcionar
                   const numero = parseFloat(
                     texto.replace(/\./g, "").replace(",", ".")
                   );
@@ -2048,6 +2032,9 @@ export default function App() {
                     );
                     atualizarCampo(i, "inputText", formatado);
                   }
+                }}
+                onFocus={() => {
+                  atualizarCampo(i, "inputText", bloco.preco); // volta ao valor numérico ao focar
                 }}
                 style={{
                   backgroundColor: "#fff9c4",
