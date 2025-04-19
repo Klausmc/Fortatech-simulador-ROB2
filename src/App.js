@@ -1814,6 +1814,25 @@ export default function App() {
     }, 4000);
     return () => clearTimeout(timer);
   }, [etapaTutorial]);
+  const interpretarROB = (robReal) => {
+    if (robReal >= 0.5) {
+      return "💡 ROB PERFEITO! Venda com confiança. Essa margem representa uma excelente contribuição para o crescimento sustentável da empresa e permite reinvestimentos em novos produtos e tecnologias.";
+    } else if (robReal >= 0.45) {
+      return "💡 Margem ideal. Você está em um ótimo ponto de negociação. Use essa condição para fechar rapidamente mantendo uma margem saudável.";
+    } else if (robReal >= 0.4) {
+      return "💡 ROB aceitável. A margem é segura, mas evite aplicar descontos adicionais. Priorize volume, cross-sell ou pagamentos antecipados.";
+    } else if (robReal >= 0.35) {
+      return "⚠️ Margem inadequada. Só avance com esse preço se o cliente for estratégico ou se houver previsão de recompra ou parcerias exclusivas.";
+    } else if (robReal >= 0.3) {
+      return "🔻 Valor crítico. Recomendado apenas para Importações sob demanda, Distribuidores homologados ou situações excepcionais com autorização prévia.";
+    } else if (robReal >= 0.25) {
+      return "🔹 Ideal para revendedores e escolas conveniadas. Use com foco em fidelização, giro rápido ou vendas recorrentes em canais indiretos.";
+    } else if (robReal >= 0.15) {
+      return "❗ Margem muito baixa. Só utilize para pedidos de Importação sob medida para Distribuidores ou recuperação de clientes estratégicos.";
+    } else {
+      return "🛑 Venda proibida. Essa margem compromete os resultados e não deve ser aprovada em nenhuma circunstância.";
+    }
+  };
 
   const corClassificacao = (classe) => {
     switch (classe) {
@@ -2204,59 +2223,62 @@ export default function App() {
               <p>
                 <strong>ROB Real:</strong> {(robReal * 100).toFixed(2)}%
               </p>
-              <p
-                style={{
-                  backgroundColor: corClassificacao(classificacao),
-                  color: classificacao === "PROIBIDO" ? "#fff" : "#000",
-                  padding: 6,
-                }}
-              >
+
+              <p>
                 <strong>Status do ROB:</strong>{" "}
                 <span style={{ fontStyle: "italic", fontWeight: "bold" }}>
                   {classificacao}
                 </span>
               </p>
+
+              {classificacao && (
+                <div
+                  style={{
+                    backgroundColor: "#f4f4f4",
+                    padding: "8px 12px",
+                    borderLeft: `6px solid ${corClassificacao(classificacao)}`,
+                    borderRadius: 4,
+                    marginTop: 8,
+                    fontSize: 14,
+                    fontStyle: "italic",
+                  }}
+                >
+                  💡 {interpretarROB(robReal)}
+                </div>
+              )}
+
               <p>
                 <strong>Comissão Aplicada:</strong>{" "}
                 {(comissao * 100).toFixed(1)}%
-                <p>
-                  <p>
-                    <strong>Tipo de Comissão:</strong>{" "}
-                    {robReal > 0.5
-                      ? "Máxima"
-                      : robReal >= 0.45
-                      ? "Alta"
-                      : robReal >= 0.4
-                      ? "Alta"
-                      : robReal >= 0.35
-                      ? "Reduzida"
-                      : robReal >= 0.3
-                      ? "Crítica"
-                      : robReal >= 0.25
-                      ? "Mínima"
-                      : "Sem Comissão"}
-                  </p>
-                </p>
               </p>
               <p>
-                <p>
-                  <strong>Valor da Comissão:</strong>{" "}
-                  {formatarMoeda(valorComissao)}
-                </p>
+                <strong>Tipo de Comissão:</strong>{" "}
+                {robReal > 0.5
+                  ? "Máxima"
+                  : robReal >= 0.45
+                  ? "Alta"
+                  : robReal >= 0.4
+                  ? "Alta"
+                  : robReal >= 0.35
+                  ? "Reduzida"
+                  : robReal >= 0.3
+                  ? "Crítica"
+                  : robReal >= 0.25
+                  ? "Mínima"
+                  : "Sem Comissão"}
               </p>
+
               <p>
                 <strong>Valor Real da Venda:</strong>{" "}
                 {formatarMoeda(totalLinha)}
               </p>
+
               <div style={{ marginTop: 20 }}>
                 <h4>Distribuição do ROB</h4>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart
                     data={[
-                      {
-                        faixa: "PERFEITO",
-                        valor: robReal >= 0.5 ? 1 : 0,
-                      },
+                      { faixa: "PERFEITO", valor: robReal >= 0.5 ? 1 : 0 },
                       {
                         faixa: "IDEAL",
                         valor: robReal >= 0.45 && robReal < 0.5 ? 1 : 0,
@@ -2273,10 +2295,7 @@ export default function App() {
                         faixa: "REVENDEDOR",
                         valor: robReal >= 0.25 && robReal < 0.35 ? 1 : 0,
                       },
-                      {
-                        faixa: "PROIBIDO",
-                        valor: robReal < 0.25 ? 1 : 0,
-                      },
+                      { faixa: "PROIBIDO", valor: robReal < 0.25 ? 1 : 0 },
                     ]}
                   >
                     <XAxis dataKey="faixa" />
